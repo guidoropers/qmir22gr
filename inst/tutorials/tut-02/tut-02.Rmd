@@ -1,0 +1,493 @@
+---
+title: "Week 02 - Data Wrangling"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: false
+    css: "css/learnr-theme.css"
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+## Packages
+library(learnr)
+library(learnrhash)
+library(tidyverse)
+gradethis::gradethis_setup()
+library(qmir22)
+
+## Data
+data(ep_elections_raw)
+data(parlgov_election)
+data(parlgov_party)
+```
+
+## Data Wrangling I
+
+This week, we have started to **wrangle some data**! 
+
+In the first part of this week's session, we learned how to subset data sets to the variables and observations that we need for our analyses, how to add new variables, order observations, how to calculate summary statistics and much more.
+
+Let's refresh and review what you have learned with this tutorial.
+
+### Packages
+
+For the following exercises, you'll need the **tidyverse** package, so go ahead and load it:
+
+```{r load-packages, exercise=TRUE}
+
+```
+
+```{r load-packages-solution}
+library(tidyverse)
+```
+
+```{r load-packages-check}
+grade_this_code("The tidyverse is now loaded!")
+```
+
+## Data
+
+The first data set used in this tutorial (`ep_elections_raw`) contains information on voter turnout and the number of total votes cast in elections to the European Parliament.
+
+Below you find an overview of the data set.
+
+| Variable name |  Description
+|:--------------|:-------------
+| `country` | Country name
+| `election_type` | Type of election
+| `year` | Year of election
+| `voter_turnout` | Voter turnout
+| `total_vote` | Total number of voters who have turned out
+
+### First look at the data
+
+You can take a peek at the data using the `glimpse()` function in the box below.
+
+```{r glimpse-data, exercise=TRUE}
+glimpse(ep_elections_raw)
+```
+
+###
+
+```{r q1, echo=FALSE}
+question("As you have just seen, the data set contains information on countries, election type, years, voter turnout and the total number of votes. How many columns does this data set have?",
+         answer("One"),
+         answer("Five", correct = TRUE),
+         answer("Six"),
+         answer("Depends on the number of countries and years in the data set"),
+         allow_retry = TRUE,
+         random_answer_order = FALSE,
+         incorrect = "Not quite. If you need help, check Wickham/Grolemund (2017) Chapter 3."
+         )
+```
+
+
+## Exercises
+
+###
+
+```{r q2, echo=FALSE}
+question("Which of the following functions allows you to pick variables based on their name?",
+         answer("select()", correct = TRUE),
+         answer("filter()", message = "filter() allows you to select observations, not variables. Check Wickham/Grolemund (2017) Chapter 5 or the lecture and lab materials for more information and examples."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE
+         )
+```
+
+###
+
+```{r q3, echo=FALSE}
+question("What does a relational operator do?",
+         answer("It tests the relationship between entities (values etc.).", correct = TRUE),
+         answer("It checks whether vectors contain NAs."),
+         answer("It executes code chunks that are related to one another."),
+         answer("It links different data sets."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE,
+         incorrect = "Not quite. If you need help, check Wickham/Grolemund (2017) Chapter 5 or the lecture material."
+         )
+```
+
+###
+
+```{r q4, echo=FALSE}
+question("What does x | y mean?",
+         answer("x or y", correct = TRUE),
+         answer("x not y", 
+                message = "x not y would be written as x & !y. Check Wickham/Grolemund (2017) Chapter 5 or the lecture material for more information."),
+         answer("x and y", 
+                message = "x and y would be written as x & y. Check Wickham/Grolemund (2017) Chapter 5 or the lecture material for more information."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE
+         )
+```
+
+###
+
+```{r q5, echo=FALSE}
+question("What does the pipe operator do?",
+         answer("It specifies a sequence of dplyr functions.", correct = TRUE),
+         answer("It calculates descriptive statistics."),
+         answer("It imports data sets."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE,
+         incorrect = "Not quite. If you need help, check Wickham/Grolemund (2017) Chapter 18 or the lecture material."
+         )
+```
+
+###
+
+```{r q6, echo=FALSE}
+question("Which dplyr function allows you to add a new variable to all observations in your data set?",
+         answer("mutate()", 
+                correct = TRUE),
+         answer("summarise()", 
+                message = "summarise() calculates summary statistics by aggregating your data set. The resulting variable is therefore not added to all observations. Check out Wickham/Grolemund (2017) Chapter 5 or the lecture and lab materials for more information and examples."),
+         answer("filter()", message = "filter() picks observations based on their value(s). Check out Wickham/Grolemund (2017) Chapter 5 or the lecture and lab materials for more information and examples."),
+         answer("add()", message = "add() does not exist. Check out Wickham/Grolemund (2017) Chapter 5 or the lecture and lab materials for more information and examples of the existing dplyr functions."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE
+         )
+```
+
+###
+
+```{r q7, echo=FALSE}
+question("You have a data set that contains the following variables: a country ID variable, a year variable and a voter turnout variable. You would like to add a variable containing the median value of voter turnout per year. What do you do?",
+         answer("data %>% group_by(year) %>% mutate(median_voter_turnout = median(voter_turnout))", 
+                correct = TRUE),
+         answer("data %>% group_by(country, year) %>% mutate(median_voter_turnout = median(voter_turnout))", 
+                message = "This code snippet would calculate the median voter turnout by country and year, we want the value to be calculated by year across all countries, however."),
+         answer("data %>% group_by(year) %>% mutate(median_voter_turnout = max(voter_turnout))", 
+                message = "This code snippet would assign the maximum value of voter turnout for each year to the new variable instead of the median voter turnout."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE
+         )
+```
+
+###
+
+```{r q8, echo=FALSE}
+question("The standard deviation describes...",
+         answer("how spread out the values are from the mean on average.",
+                correct = TRUE),
+         answer("how spread out the values are from the median on average."),
+         answer("how confident we are that we measured the mean correctly."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE,
+         incorrect = "Not quite. If you need help, check the lab material or Imai (2017) Chapter 2.6."
+         )
+```
+
+###
+
+Now, you'll begin to work with the `ep_elections_raw` data.
+
+It seems that something went wrong with the variable `voter_turnout` when importing the data. Turnout should have been measured in percent. Have a look at the variable; then, divide it by 100 and save the result in a new variable called `voter_turnout_pc`. 
+
+```{r exercise1, exercise=TRUE}
+
+```
+
+###
+
+Then, calculate the average `voter_turnout_pc` per country:
+
+```{r create-voter-turnout-pc-variable}
+ep_elections_raw <- mutate(ep_elections_raw, voter_turnout_pc = voter_turnout / 100)
+```
+
+```{r exercise2, exercise=TRUE, exercise.setup = "create-voter-turnout-pc-variable"}
+
+```
+
+<div id="exercise2-hint">
+**Hint:** You may want to use **dplyr**'s `group_by()`, `summarise()`, `filter()` and `arrange()` functions.
+</div>
+
+```{r exercise2-sol, echo=FALSE, eval=FALSE}
+# q9
+ep_elections_raw %>%
+  group_by(country) %>%
+  summarise(mean = mean(voter_turnout_pc, na.rm = TRUE)) %>%
+  filter(country == "Germany")
+
+# or (semi-correct)
+ep_elections_raw %>%
+  filter(country == "Germany") %>%
+  summarise(mean = mean(voter_turnout_pc, na.rm = TRUE))
+
+# q10
+ep_elections_raw %>%
+  group_by(country) %>%
+  summarise(mean = mean(voter_turnout_pc, na.rm = TRUE)) %>%
+  filter(mean == min(mean))
+
+# or
+ep_elections_raw %>%
+  group_by(country) %>%
+  summarise(mean = mean(voter_turnout_pc, na.rm = TRUE)) %>%
+  arrange(mean)
+```
+
+```{r q9, echo=FALSE}
+question_text(
+  "What is the average voter turnout in Germany? Enter the number, rounded to two digits after the decimal.",
+  answer("53.98", correct = TRUE),
+  allow_retry = TRUE,
+  incorrect = "Not quite. Have you entered the number with two digits after the decimal?"
+)
+```
+
+```{r q10, echo=FALSE}
+question_text(
+  "And which country has the lowest average voter turnout?",
+  answer("Slovakia", correct = TRUE),
+  allow_retry = TRUE,
+  incorrect = "Not quite. Have you spelled the country name correctly?"
+)
+```
+
+###
+
+Next, calculate the number of eligible voters for each election in each country based on the variables `voter_turnout_pc` and `total_vote`. Add the result as a new variable called `eligible_voters`. The formula to calculate the number of eligible voters is a simple rule of three. Keep in mind that the variable `voter_turnout_pc` is measured in percent. 
+
+```{r exercise3-sol, echo=FALSE, eval=FALSE}
+ep_elections_raw <- ep_elections_raw %>%
+  group_by(country, year) %>%
+  mutate(eligible_voters = (total_vote/voter_turnout_pc) * 100) 
+
+ep_elections_raw %>% filter(country == "Germany" & year == "2009")
+```
+
+```{r exercise3, exercise=TRUE, exercise.setup="create-voter-turnout-pc-variable"}
+
+```
+
+<div id="exercise3-hint">
+**Hint:** The formula to calculate the number of eligible voters is `(total_vote/voter_turnout_pc) * 100`.
+</div>
+
+```{r q11, echo=FALSE}
+question_text(
+  "How many voters have been eligible to vote in the European Parliament elections in Germany in 2009? Enter the number without separators (such as . or ,) and round to the next lowest integer.",
+  answer("62222357", correct = TRUE),
+  allow_retry = TRUE,
+  incorrect = "Not quite. Are you sure you have specified the formula correctly?"
+
+)
+
+```
+
+## Data Wrangling II
+
+In the second part of this week's seesion we have extended our knowledge on data wrangling and data transformation. Among other things, we have learned about importing different storage types of data into R, variables classes, pivoting data and joining multiple data sets.
+
+## Data
+
+The data for this exercise comes from [Parlgov](http://www.parlgov.org/), a database on parliaments and governments for all countries in the European Union.
+
+The two data sets `parlgov_election` and `parlgov_party`, which are already loaded into the environment, contain the following variables:
+
+- `parlgov_election`
+
+| Variable name |  Description
+|:--------------|:--------------------------------
+| `country` | Abbreviated country name
+| `party` | Party name
+| `2014` | Vote share in the 2014 European Parliament elections
+| `2019` | Vote share in the 2019 European Parliament elections
+
+- `parlgov_party`
+
+| Variable name |  Description
+|:--------------|:--------------------------------
+| `country` | Abbreviated country name
+| `party` | Party name
+| `family_name` | Party family
+| `left_right` | Time-invariant party position on left-right scale
+
+Use the code chunk below, to explore both data sets.
+
+```{r inspect-data, exercise=TRUE}
+
+```
+
+<div id="inspect-data-hint">
+**Hint:** You may want to use functions like `glimpse()`, `head()`, `names()`, `dim()`, `nrow()` or `ncol()` or some of the **dplyr** functions we learned about last week.
+</div>
+
+###
+
+What class is the variable `family_name` in `parlgov_party`?
+
+```{r check-class, exercise=TRUE}
+
+```
+
+<div id="check-class-hint">
+**Hint:** You may want to use `class()` or `glimpse()`.
+</div>
+
+```{r question-class, echo=FALSE}
+question("The party family variable is a ...",
+         answer("character vector", correct = TRUE),
+         answer("numeric vector"),
+         answer("logical vector"),
+         allow_retry = TRUE,
+         random_answer_order = TRUE)
+```
+
+
+## Exercises
+
+### 
+
+Take a peek at the election data (`parlgov_election`) by running the code in the box below.
+
+```{r glimpse-election-data, exercise=TRUE}
+head(parlgov_election)
+```
+
+```{r question-wide-long, echo=FALSE}
+question("Is this data set wide or long?",
+         answer("Wide", correct = TRUE),
+         answer("Long", message = "What characterizes long data? What characterizes wide data? If you need help, refer to Wickham/Grolemund (2017) Chapter 12 or the lecture material."),
+         allow_retry = TRUE
+         )
+```
+
+### 
+
+Correct! Often, we need to pivot data from a wider into a longer form.
+
+```{r question-pivot, echo=FALSE}
+question_checkbox("Why? Check all possible reasons that apply.",
+                  answer("Data in a wider format is not tidy.", correct = TRUE),
+                  answer("A longer format is required to visualize the data.", correct = TRUE),
+                  answer("Data in a longer form always saves storage space.", 
+                         message = "If you need help, refer to Wickham/Grolemund (2017) Chapter 12 or the lecture material."),
+                  answer("Data in a wider format cannot be saved.",
+                         message = "If you need help, refer to Wickham/Grolemund (2017) Chapter 12 or the lecture material."),
+                  allow_retry = TRUE,
+                  random_answer_order = TRUE
+                  )
+```
+
+###
+
+```{r question-pivot-longer, echo=FALSE}
+question_checkbox("What does the function \"pivot_longer( )\" do? Check all answers that apply.",
+                  answer("It transforms data from a wider into a longer format.", correct = TRUE),
+                  answer("It transforms data from a longer into a wider format.",
+                         message = "That's \"pivot_wider()\". If you need help, refer to Wickham/Grolemund (2017) Chapter 12 or the lecture material."),
+                  answer("It checks whether a data set is in longer format.", 
+                         message = "There is no specific function that tells you whether a data set is in longer format. Instead, you have to inspect the data set. If you need help, refer to Wickham/Grolemund (2017) Chapter 12 or the lecture material."),
+                  answer("It checks whether a data set is in wider format.", 
+                         message = "There is no specific function that tells you whether a data set is in wider format. Instead, you have to inspect the data set. If you need help, refer to Wickham/Grolemund (2017) Chapter 12 or the lecture material."),
+                  allow_retry = TRUE,
+                  random_answer_order = TRUE
+                  )
+```
+
+###
+
+Pivot `parlgov_election` into a longer, tidy form. Name the two new resulting variables `election_year` and `vote_share`.
+
+```{r exercise-pivot, exercise=TRUE}
+parlgov_election_longer <- _____ %>%
+  _____(_____ = ____,
+      ____ = ____,
+      ____ = ____)
+```
+
+```{r exercise-pivot-hint-1}
+parlgov_election_longer <- ____ %>%
+  pivot____(____ = ____,
+            ____ = ____,
+            ____ = ____)
+```
+
+```{r exercise-pivot-hint-2}
+parlgov_election_longer <- ____ %>%
+  pivot_longer(____ = ____,
+               ____ = ____,
+               ____ = ____)
+```
+
+```{r exercise-pivot-hint-3}
+parlgov_election_longer <- ____ %>%
+  pivot_longer(cols = ____, 
+               names_to = ____,
+               values_to = ____)
+```
+
+```{r exercise-pivot-solution, exercise.reveal_solution = FALSE}
+parlgov_election_longer <- parlgov_election %>%
+  pivot_longer(cols = `2014`:`2019`, 
+               names_to = "election_year",
+               values_to = "vote_share")
+```
+
+```{r exercise-pivot-check}
+grade_this_code("You successfully pivoted the data set to a longer form. You can now move on to joining it with \"parlgov_party\" in the next exercise.")
+```
+
+### Joining data sets
+
+Next, we want to add information on the party family and left-right position from `parlgov_party` to all parties contained in `parlgov_election_longer`.
+
+```{r question-join, echo=FALSE}
+question("Which of the following joins do you need to use?",
+         answer("left_join()", correct = TRUE),
+         answer("right_join()", message = "right_join() would add the vote shares to the data set containing party family and left-right position - not the other way around. For more information check Wickham/Grolemund (2017) Chapter 13 or the lecture material."),
+         answer("full_join()", message = "full_join() would keep all observations in both data sets. For more information check Wickham/Grolemund (2017) Chapter 13 or the lecture material."),
+         answer("anti_join()", message = "anti_join() would only keep observations that do not have a match in the other data set. For more information check Wickham/Grolemund (2017) Chapter 13 or the lecture material."),
+         allow_retry = TRUE,
+         random_answer_order = TRUE
+         )
+```
+
+###
+
+Now, join both data sets as described above.
+
+```{r prepare-join, include=FALSE}
+parlgov_election_longer <- pivot_longer(parlgov_election,
+                                        cols = `2014`:`2019`,
+                                        names_to = "election_year",
+                                        values_to = "vote_share")
+```
+
+```{r exercise-join, exercise=TRUE, exercise.setup="prepare-join"}
+parlgov_joined <- ____(____, ____, ____)
+```
+
+```{r exercise-join-hint-1}
+parlgov_joined <- ____(____, ____, by = ____)
+```
+
+```{r exercise-join-hint-2}
+parlgov_joined <- ____(____, ____, by = c(____, ____))
+```
+
+```{r exercise-join-solution, exercise.reveal_solution = FALSE}
+parlgov_joined <- left_join(parlgov_election_longer, parlgov_party, by = c("country", "party"))
+```
+
+```{r exercise-join-check}
+grade_this_code("You successfully joined both data sets.")
+```
+
+
+## Submit
+
+```{r context="server"}
+learnrhash::encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(default_ui(url = ""))
+```
