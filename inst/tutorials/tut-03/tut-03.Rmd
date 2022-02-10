@@ -14,7 +14,7 @@ library(learnr)
 library(learnrhash)
 library(tidyverse)
 gradethis::gradethis_setup()
-library(qmir22)
+library(qmir22gr)
 
 ## Data
 data(ep_elections)
